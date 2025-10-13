@@ -15,4 +15,9 @@ mongoose.connect(process.env.DATABASE_URL)
 
 app.use('/api/animes', require('./routes/animes'));
 
+app.get('/', (req, res) => {
+  res.send('Servidor Anime Tracker funcionando 🚀');
+});
+
+
 app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${PORT}`));
