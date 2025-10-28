@@ -43,3 +43,8 @@ coverage/
 *.bak
 *.tmp
 *.old
+
+
+node_modules
+.env
+uploads/

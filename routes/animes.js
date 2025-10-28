@@ -1,62 +1,79 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const Anime = require('../models/Anime');
+const auth = require('../middleware/auth');
 
-async function getAnime(req, res, next) {
-  try {
-    const anime = await Anime.findById(req.params.id);
-    if (!anime) return res.status(404).json({ message: 'Anime no encontrado' });
-    res.anime = anime;
-    next();
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
   }
-}
+});
+const upload = multer({ storage: storage });
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
-    const animes = await Anime.find();
+    const animes = await Anime.find({ user: req.user.id }).sort({ createdAt: -1 });
     res.json(animes);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al obtener los animes' });
+  } catch (err) {
+    res.status(500).send('Error del servidor');
   }
 });
 
-router.get('/:id', getAnime, (req, res) => {
-  res.json(res.anime);
-});
-
-router.post('/', async (req, res) => {
-  const { titulo, estado, puntuacion, imagen } = req.body;
-  const anime = new Anime({ titulo, estado, puntuacion, imagen });
+router.post('/', auth, upload.single('imagen'), async (req, res) => {
+  const { titulo, estado, episodios, temporadas, ovas, peliculas, comentarios, puntuacion } = req.body;
+  if (!req.file) {
+    return res.status(400).json({ message: 'La imagen es requerida' });
+  }
   try {
-    const nuevoAnime = await anime.save();
-    res.status(201).json(nuevoAnime);
-  } catch (error) {
-    res.status(400).json({ message: 'Error al crear el anime' });
+    const newAnime = new Anime({
+      user: req.user.id,
+      titulo,
+      estado,
+      imagen: req.file.path,
+      episodios,
+      temporadas,
+      ovas,
+      peliculas,
+      comentarios,
+      puntuacion
+    });
+    const anime = await newAnime.save();
+    res.json(anime);
+  } catch (err) {
+    res.status(500).send('Error del servidor');
   }
 });
 
-router.patch('/:id', getAnime, async (req, res) => {
-  const { titulo, estado, puntuacion, imagen } = req.body;
-  if (titulo !== undefined) res.anime.titulo = titulo;
-  if (estado !== undefined) res.anime.estado = estado;
-  if (puntuacion !== undefined) res.anime.puntuacion = puntuacion;
-  if (imagen !== undefined) res.anime.imagen = imagen;
+router.patch('/:id', auth, async (req, res) => {
   try {
-    const animeActualizado = await res.anime.save();
-    res.json(animeActualizado);
-  } catch (error) {
-    res.status(400).json({ message: 'Error al actualizar el anime' });
+    let anime = await Anime.findById(req.params.id);
+    if (!anime) return res.status(404).json({ message: 'Anime no encontrado' });
+    if (anime.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'No autorizado' });
+    }
+    anime = await Anime.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
+    res.json(anime);
+  } catch (err) {
+    res.status(500).send('Error del servidor');
   }
 });
 
-router.delete('/:id', getAnime, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
-    await res.anime.deleteOne();
-    res.json({ message: 'Anime eliminado correctamente' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error al eliminar el anime' });
+    let anime = await Anime.findById(req.params.id);
+    if (!anime) return res.status(404).json({ message: 'Anime no encontrado' });
+    if (anime.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'No autorizado' });
+    }
+    await Anime.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Anime eliminado' });
+  } catch (err) {
+    res.status(500).send('Error del servidor');
   }
 });
 
