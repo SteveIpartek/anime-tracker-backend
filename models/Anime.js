@@ -11,6 +11,9 @@ const AnimeSchema = new mongoose.Schema({
   imagen: { type: String, required: true },
   episodios: { type: Number, default: 0 },
   temporadas: { type: Number, default: 0 },
+  
+  genero: { type: String, trim: true, default: '' }, // <-- AÑADE ESTA LÍNEA
+
   ovas: { type: Number, default: 0 },
   peliculas: { type: Number, default: 0 },
   comentarios: { type: String, trim: true, default: '' },

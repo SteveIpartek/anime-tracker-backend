@@ -18,7 +18,7 @@ router.post('/register', async (req, res) => {
     const payload = { user: { id: user.id } };
     jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '5h' }, (err, token) => {
       if (err) throw err;
-      res.json({ token });
+      res.json({ token, username: user.username });
     });
   } catch (err) {
     res.status(500).send('Error del servidor');
@@ -37,7 +37,7 @@ router.post('/login', async (req, res) => {
     const payload = { user: { id: user.id } };
     jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '5h' }, (err, token) => {
       if (err) throw err;
-      res.json({ token });
+      res.json({ token, username: user.username });
     });
   } catch (err) {
     res.status(500).send('Error del servidor');

@@ -25,7 +25,9 @@ router.get('/', auth, async (req, res) => {
 });
 
 router.post('/', auth, upload.single('imagen'), async (req, res) => {
-  const { titulo, estado, episodios, temporadas, ovas, peliculas, comentarios, puntuacion } = req.body;
+  // 1. 'puntuacion' YA NO ESTÁ AQUÍ
+  const { titulo, estado, episodios, temporadas, genero, ovas, peliculas, comentarios } = req.body;
+  
   if (!req.file) {
     return res.status(400).json({ message: 'La imagen es requerida' });
   }
@@ -37,14 +39,17 @@ router.post('/', auth, upload.single('imagen'), async (req, res) => {
       imagen: req.file.path,
       episodios,
       temporadas,
+      genero,
       ovas,
       peliculas,
-      comentarios,
-      puntuacion
+      comentarios
+      // 2. 'puntuacion' YA NO ESTÁ AQUÍ
     });
     const anime = await newAnime.save();
     res.json(anime);
   } catch (err) {
+    // Si quieres ver el error, añade esta línea:
+    console.error("¡¡ERROR AL CREAR!!:", err); 
     res.status(500).send('Error del servidor');
   }
 });
