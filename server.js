@@ -19,4 +19,8 @@ app.use('/api/animes', require('./routes/animes'));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.get('/', (req, res) => {
+  res.send('El motor del BACKEND está funcionando correctamente.');
+});
+
 app.listen(PORT, () => console.log(`Servidor en puerto ${PORT}`));
