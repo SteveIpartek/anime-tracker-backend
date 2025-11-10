@@ -67,6 +67,7 @@ router.patch('/:id', auth, async (req, res) => {
     anime = await Anime.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
     res.json(anime);
   } catch (err) {
+    console.error("¡¡ERROR AL ACTUALIZAR (PATCH)!!:", err);
     res.status(400).json({ message: "Error al actualizar el anime." });
   }
 });
