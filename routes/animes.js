@@ -25,7 +25,10 @@ router.get('/', auth, async (req, res) => {
 });
 
 router.post('/', auth, upload.single('imagen'), async (req, res) => {
-  const { titulo, estado, episodios, temporadas, genero, ovas, peliculas, comentarios, puntuacion } = req.body;
+  const { 
+    titulo, estado, episodios, temporadas, genero, ovas, peliculas, comentarios, puntuacion,
+    temporadaActual, episodioActual 
+  } = req.body;
   
   if (!req.file) {
     return res.status(400).json({ message: 'La imagen es requerida' });
@@ -42,7 +45,9 @@ router.post('/', auth, upload.single('imagen'), async (req, res) => {
       ovas,
       peliculas,
       comentarios,
-      puntuacion
+      puntuacion,
+      temporadaActual,
+      episodioActual
     });
     const anime = await newAnime.save();
     res.json(anime);

@@ -15,7 +15,11 @@ const AnimeSchema = new mongoose.Schema({
   ovas: { type: Number, default: 0 },
   peliculas: { type: Number, default: 0 },
   comentarios: { type: String, trim: true, default: '' },
-  puntuacion: { type: Number, min: 0, max: 5, default: 0 }
+  puntuacion: { type: Number, min: 0, max: 5, default: 0 },
+  
+  temporadaActual: { type: Number, default: 0 },
+  episodioActual: { type: Number, default: 0 }
+  
 }, { timestamps: true });
 
 module.exports = mongoose.model('Anime', AnimeSchema);
