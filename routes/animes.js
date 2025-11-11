@@ -1,19 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
 const Anime = require('../models/Anime');
 const auth = require('../middleware/auth');
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage: storage });
+const upload = require('../config/cloudinary');
 
 router.get('/', auth, async (req, res) => {
   try {
@@ -33,6 +22,7 @@ router.post('/', auth, upload.single('imagen'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'La imagen es requerida' });
   }
+  
   try {
     const newAnime = new Anime({
       user: req.user.id,

@@ -17,8 +17,6 @@ mongoose.connect(process.env.DATABASE_URL)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/animes', require('./routes/animes'));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 app.get('/', (req, res) => {
   res.send('El motor del BACKEND está funcionando correctamente.');
 });
